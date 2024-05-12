@@ -11,3 +11,20 @@ def dashboard():
     if 'loggedin' in session:
         return render_template('dashboard.html')
     return redirect(url_for('login'))
+
+
+def feedbacks():
+    if 'loggedin' in session:
+        return render_template('feedbacks.html')
+    return redirect(url_for('login'))
+
+
+def products():
+    if 'loggedin' in session:
+        return render_template('products.html')
+    return redirect(url_for('login'))
+
+def orders():
+    if 'loggedin' in session:
+        return render_template('orders.html')
+    return redirect(url_for('login'))

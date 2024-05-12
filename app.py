@@ -5,7 +5,7 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from init_db import create_table, connect_db
 from login import logout, register, login,get_all_items
-from navbar import dashboard
+from navbar import dashboard, feedbacks, products, orders
 
 app = Flask(__name__)
 app.secret_key = 'onur'
@@ -16,6 +16,10 @@ app.add_url_rule('/login', 'login', login, methods=['GET', 'POST'])
 app.add_url_rule('/logout', 'logout', logout)
 app.add_url_rule('/register', 'register', register, methods=['GET', 'POST'])
 app.add_url_rule('/dashboard', 'dashboard',dashboard , methods=['GET', 'POST'])
+app.add_url_rule('/feedbacks', 'feedbacks', feedbacks, methods=['GET', 'POST'])
+app.add_url_rule('/products', 'products', products, methods=['GET', 'POST'])
+app.add_url_rule('/orders', 'orders', orders, methods=['GET', 'POST'])
+
 
 
 @app.route('/')
