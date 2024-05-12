@@ -1,77 +1,81 @@
-from flask import request, redirect, url_for, render_template
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import session, redirect, url_for
+from flask import Flask, request, session, redirect, url_for, render_template, flash
 import psycopg2
+import psycopg2.extras
+import re
+from werkzeug.security import generate_password_hash, check_password_hash
+from init_db import create_table, connect_db, get_all_items
+
+conn = connect_db()
 
 
-class Login:
-    def __init__(self, app):
-        self.app = app
-        self.app.add_url_rule('/', view_func=self.login, methods=['GET', 'POST'])
-        self.app.add_url_rule('/register', view_func=self.register, methods=['GET', 'POST'])
+def login():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    def connect_db(self):
-        conn = psycopg2.connect(
-            dbname="studentapp",
-            user="onur",
-            password="123",
-            host="127.0.0.1",
-            port="5432"
-        )
-        return conn
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        username = request.form['username']
+        password = request.form['password']
+        print("password:", password)
 
-    def get_user(self, username):
-        conn = self.connect_db()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE username = %s", (username,))
-        user = cur.fetchone()
-        conn.close()
-        return user
+        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
 
-    def register(self):
-        if request.method == 'POST':
-            student_id = request.form['student_id']
-            name = request.form['name']
-            surname = request.form['surname']
-            username = request.form['username']
-            password = request.form['password']
-            email = request.form['email']
+        account = cursor.fetchone()
+        print("account :", account)
 
-            conn = self.connect_db()
-            cur = conn.cursor()
-
-            # Check if student_id, username, or email already exists in the database
-            cur.execute("SELECT * FROM users WHERE student_id = %s OR username = %s OR email = %s",
-                        (student_id, username, email))
-            existing_user = cur.fetchone()
-
-            if existing_user:
-                error_message = "Student ID, username, or email is already in use. Please choose another one."
-                conn.close()
-                return render_template('register.html', error=error_message)
+        if account:
+            password_rs = account['password']
+            print("from database password:", password_rs)
+            print(password)
+            if check_password_hash(password_rs, password):
+                session['loggedin'] = True
+                session['id'] = account['id']
+                session['username'] = account['username']
+                return redirect(url_for('house'))
             else:
-                print("else girdi")
-                print(student_id, name, surname, username, password, email)
-                cur.execute(
-                    "INSERT INTO users (student_id, name, surname, username, password, email) VALUES (%s, %s, %s, %s, "
-                    "%s, %s)",
-                    (student_id, name, surname, username, password, email))
-                conn.commit()
-                conn.close()
-                return redirect(url_for('login'))
+                flash('Incorrect username/password')
+        else:
+            flash('Incorrect username/password')
 
-        return render_template('register.html')
+    return render_template('login.html')
 
-    def login(self):
-        if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
-            user = self.get_user(username)
 
-            if user and user[5] == password:
-                print('User found')
-                return redirect(url_for('dashboard'))
-            else:
-                print('User not found')
-                error = 'Invalid username or password. Please try again.'
-                return render_template('login.html', error=error)
-        return render_template('login.html')
+def register():
+    print("register function")
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if (request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email'
+            in request.form):
+        fullname = request.form['fullname']
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+
+        _hashed_password = generate_password_hash(password)
+
+        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+        account = cursor.fetchone()
+        print(account)
+        if account:
+            flash('Account already exists!')
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            flash('Invalid email address!')
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            flash('Username must contain only characters and numbers!')
+        elif not username or not password or not email:
+            flash('Please fill out the form!')
+        else:
+            cursor.execute("INSERT INTO users (fullname, username, password, email) VALUES (%s,%s,%s,%s)",
+                           (fullname, username, _hashed_password, email))
+            conn.commit()
+            flash('You have successfully registered!')
+    elif request.method == 'POST':
+        flash('Please fill out the form!')
+    return render_template('register.html')
+
+
+def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+
+    return redirect(url_for('login'))

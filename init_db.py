@@ -5,77 +5,71 @@ def connect_db():
     conn = psycopg2.connect(
         database="studentapp", user='onur', password='123', host='127.0.0.1', port='5432'
     )
+
     return conn
 
 
 def create_table():
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute('DROP TABLE IF EXISTS books;')
-    cur.execute('CREATE TABLE books (id serial PRIMARY KEY,'
-                'title varchar (150) NOT NULL,'
-                'author varchar (50) NOT NULL,'
-                'pages_num integer NOT NULL,'
-                'review text,'
-                'date_added date DEFAULT CURRENT_TIMESTAMP);'
-                )
 
+    cur.execute("""drop table if exists users""")
     cur.execute("""
-                CREATE TABLE IF NOT EXISTS users (
-                    user_id SERIAL PRIMARY KEY,
-                    student_id INT NOT NULL,
-                    name VARCHAR(25) NOT NULL,
-                    surname VARCHAR(25) NOT NULL,
-                    username VARCHAR(25) NOT NULL,
-                    password VARCHAR(16) NOT NULL,
-                    email VARCHAR(100),
-                    reputation INT,
-                    CONSTRAINT email_check CHECK (email LIKE '%@%.%')
-                )
-            """)
-    cur.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
-
+                    CREATE TABLE users (
+                    id serial PRIMARY KEY,
+                    fullname VARCHAR ( 100 ) NOT NULL,
+                    username VARCHAR ( 50 ) NOT NULL,
+                    password VARCHAR ( 255 ) NOT NULL,
+                    email VARCHAR ( 50 ) NOT NULL
+                    );
+                    """)
+    cur.execute("""drop table if exists items""")
     cur.execute("""
-                INSERT INTO users (student_id, name, surname, username, password, email, reputation)
-                VALUES 
-                    (123456, 'onur', 'Doe', 'onur', '123', 'johndoe@example.com', 100),
-                    (654321, 'emre', 'Smith', 'emre', '123', 'janesmith@example.com', 80)
-            """)
+                    CREATE TABLE items (
+                    id serial PRIMARY KEY,
+                    name VARCHAR ( 100 ) NOT NULL,
+                    price FLOAT NOT NULL
+                    );
+                    """)
 
-    cur.execute('INSERT INTO books (title, author, pages_num, review)'
-                'VALUES (%s, %s, %s, %s)',
-                ('A Tale of Two Cities',
-                 'Charles Dickens',
-                 489,
-                 'A great classic!')
-                )
+    cur.execute("""insert into items (name, price) values ('item1', 10)""")
+    cur.execute("""insert into items (name, price) values ('item2', 20)""")
+    cur.execute("""insert into items (name, price) values ('item3', 30)""")
+    cur.execute("""insert into items (name, price) values ('item4', 40)""")
+    
+    conn.commit()
 
-    cur.execute('INSERT INTO books (title, author, pages_num, review)'
-                'VALUES (%s, %s, %s, %s)',
-                ('Anna Karenina',
-                 'Leo Tolstoy',
-                 864,
-                 'Another great classic!')
-                )
+    # cur.execute("""
+    #             CREATE TABLE IF NOT EXISTS users (
+    #                 user_id SERIAL PRIMARY KEY,
+    #                 student_id INT NOT NULL,
+    #                 name VARCHAR(25) NOT NULL,
+    #                 surname VARCHAR(25) NOT NULL,
+    #                 username VARCHAR(25) NOT NULL,
+    #                 password VARCHAR(16) NOT NULL,
+    #                 email VARCHAR(100),
+    #                 reputation INT,
+    #                 CONSTRAINT email_check CHECK (email LIKE '%@%.%')
+    #             )
+    #         """)
+    # cur.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
+    #
+    # cur.execute("""
+    #             INSERT INTO users (student_id, name, surname, username, password, email, reputation)
+    #             VALUES
+    #                 (123456, 'onur', 'Doe', 'onur', '123', 'johndoe@example.com', 100),
+    #                 (654321, 'emre', 'Smith', 'emre', '123', 'janesmith@example.com', 80)
+    #         """)
 
     conn.commit()
     conn.close()
 
 
-def insert_book(title, author, pages_num, review):
+def get_all_items():
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute('INSERT INTO books (title, author, pages_num, review)'
-                'VALUES (%s, %s, %s, %s)',
-                (title, author, pages_num, review))
-    conn.commit()
+    cur.execute('SELECT * from items;')
+    items = cur.fetchall()
     conn.close()
-
-
-def get_all_books():
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM books;')
-    books = cur.fetchall()
-    conn.close()
-    return books
+    print(items)
+    return items

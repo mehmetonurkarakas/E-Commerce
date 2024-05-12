@@ -4,33 +4,38 @@
     <meta charset="UTF-8">
     <title>{% block title %} {% endblock %} - FlaskApp</title>
     <style>
+        nav {
+            background-color: #333;
+            padding: 10px 0;
+            text-align: center;
+        }
+
         nav a {
-            color: #d64161;
-            font-size: 3em;
-            margin-left: 50px;
+            color: #fff;
+            font-size: 1.5em;
+            margin: 0 20px;
             text-decoration: none;
         }
 
-        .book {
-            padding: 20px;
-            margin: 10px;
-            background-color: #f7f4f4;
+        .content {
+            margin-top: 20px;
+
         }
 
-        .review {
-                margin-left: 50px;
-                font-size: 20px;
+        .heads {
+            font-size: 2em;
+            color: black;
+            text-align: left;
         }
 
     </style>
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('index') }}">FlaskApp</a>
-        <a href="{{ url_for('create') }}">Create</a>
-        <a href="#">About</a>
+        <span class = "heads">Welcome to Hacettepe E-commerce App</span>
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
     </nav>
-    <hr>
     <div class="content">
         {% block content %} {% endblock %}
     </div>
