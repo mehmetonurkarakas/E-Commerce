@@ -15,17 +15,13 @@ def login():
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
-        print("password:", password)
 
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
 
         account = cursor.fetchone()
-        print("account :", account)
 
         if account:
             password_rs = account['password']
-            print("from database password:", password_rs)
-            print(password)
             if check_password_hash(password_rs, password):
                 session['loggedin'] = True
                 session['id'] = account['id']
@@ -40,7 +36,6 @@ def login():
 
 
 def register():
-    print("register function")
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if (request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email'
@@ -54,7 +49,6 @@ def register():
 
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         account = cursor.fetchone()
-        print(account)
         if account:
             flash('Account already exists!')
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):

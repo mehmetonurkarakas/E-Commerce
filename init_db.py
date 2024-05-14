@@ -1,4 +1,5 @@
 import psycopg2
+from werkzeug.security import generate_password_hash
 
 
 def connect_db():
@@ -23,20 +24,33 @@ def create_table():
                     email VARCHAR ( 50 ) NOT NULL
                     );
                     """)
+
+    _hashed_password = generate_password_hash('123')
+
+    cur.execute("INSERT INTO users (fullname, username, password, email) VALUES (%s,%s,%s,%s)",
+                ('onure', 'onur', _hashed_password, 'a@gmail.com'))
+    cur.execute("INSERT INTO users (fullname, username, password, email) VALUES (%s,%s,%s,%s)",
+                ('emre', 'emre', _hashed_password, 'b@gmail.com'))
+
+    cur.execute("INSERT INTO users (fullname, username, password, email) VALUES (%s,%s,%s,%s)",
+                ('ali', 'ali', _hashed_password, 'c@gmail.com'))
+    conn.commit()
+
     cur.execute("""drop table if exists items""")
     cur.execute("""
                     CREATE TABLE items (
-                    id serial PRIMARY KEY,
+                    item_id serial PRIMARY KEY,
                     name VARCHAR ( 100 ) NOT NULL,
-                    price FLOAT NOT NULL
+                    price FLOAT NOT NULL,
+                    user_id INT REFERENCES users(id)
                     );
                     """)
 
-    cur.execute("""insert into items (name, price) values ('item1', 10)""")
-    cur.execute("""insert into items (name, price) values ('item2', 20)""")
-    cur.execute("""insert into items (name, price) values ('item3', 30)""")
-    cur.execute("""insert into items (name, price) values ('item4', 40)""")
-    
+    cur.execute("""insert into items (name, price,user_id) values ('item1', 10,1)""")
+    cur.execute("""insert into items (name, price,user_id) values ('item2', 20,1)""")
+    cur.execute("""insert into items (name, price,user_id) values ('item3', 30,2)""")
+    cur.execute("""insert into items (name, price,user_id) values ('item4', 40,2)""")
+
     conn.commit()
 
     # cur.execute("""
@@ -71,5 +85,16 @@ def get_all_items():
     cur.execute('SELECT * from items;')
     items = cur.fetchall()
     conn.close()
-    print(items)
     return items
+
+
+def specific_items(user_id):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM items WHERE user_id = %s ORDER BY item_id;', [user_id])
+    items = cur.fetchall()
+    conn.close()
+    return items
+
+
+

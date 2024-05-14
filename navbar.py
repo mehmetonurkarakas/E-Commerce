@@ -4,7 +4,8 @@ import psycopg2
 import psycopg2.extras
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
-from init_db import create_table, connect_db, get_all_items
+from init_db import create_table, connect_db, get_all_items, specific_items
+conn = connect_db()
 
 
 def dashboard():
@@ -20,9 +21,13 @@ def feedbacks():
 
 
 def products():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     if 'loggedin' in session:
-        return render_template('products.html')
+        items = specific_items(session['id'])
+        return render_template('products.html', items=items)
     return redirect(url_for('login'))
+
 
 def orders():
     if 'loggedin' in session:
