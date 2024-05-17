@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<h1>Reports</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Report ID</th>
+            <th>Report Name</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>{{ report.id }}</td>
+            <td>{{ report.name }}</td>
+            <td>{{ report.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

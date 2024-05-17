@@ -1,4 +1,3 @@
-from flask import session, redirect, url_for
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 import psycopg2
 import psycopg2.extras
@@ -17,8 +16,13 @@ def login():
         password = request.form['password']
 
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
-
         account = cursor.fetchone()
+        is_admin = False
+
+        if not account:
+            cursor.execute('SELECT * FROM admins WHERE username = %s', (username,))
+            account = cursor.fetchone()
+            is_admin = True if account else False
 
         if account:
             password_rs = account['password']
@@ -26,6 +30,8 @@ def login():
                 session['loggedin'] = True
                 session['id'] = account['id']
                 session['username'] = account['username']
+                session['is_admin'] = is_admin
+                print(session)
                 return redirect(url_for('house'))
             else:
                 flash('Incorrect username/password')
@@ -71,5 +77,6 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
+    session.pop('is_admin', None)
 
     return redirect(url_for('login'))

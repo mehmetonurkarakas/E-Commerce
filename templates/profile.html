@@ -11,7 +11,7 @@
             <td>Name:</td>
             <td>{{ account['fullname'] }}</td>
         </tr>
-  <tr>
+        <tr>
             <td>Username:</td>
             <td>{{ account['username'] }}</td>
         </tr>
@@ -20,5 +20,53 @@
             <td>{{ account['email'] }}</td>
         </tr>
     </table>
+
+        {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+
+    <!-- Profil Güncelleme Formu -->
+    <h2>Update Profile</h2>
+    <form method="POST" action="{{ url_for('update_profile') }}" onsubmit="return validateForm()">
+        <label>
+            Full Name:
+            <input type="text" name="fullname" value="{{ account['fullname'] }}" >
+        </label>
+        <br>
+        <label>
+            Username:
+            <input type="text" name="username" value="{{ account['username'] }}"  >
+        </label>
+        <br>
+        <label>
+            Email:
+            <input type="email" name="email" value="{{ account['email'] }}" >
+        </label>
+        <br>
+        <button type="submit">Update</button>
+    </form>
 </div>
+
+<script>
+function validateForm() {
+    var username = document.querySelector('input[name="username"]').value;
+    var fullname = document.querySelector('input[name="fullname"]').value;
+    if (fullname.length < 3) {
+        alert("Full Name must be at least 3 characters long.");
+        return false;
+    }
+    if (username.length < 3) {
+        alert("Username must be at least 3 characters long.");
+        return false;
+    }
+    return true;
+}
+</script>
 {% endblock %}

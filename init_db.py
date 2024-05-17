@@ -97,4 +97,25 @@ def specific_items(user_id):
     return items
 
 
+def create_admin():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("""drop table if exists admins""")
+    cur.execute("""
+                    CREATE TABLE admins (
+                    id serial PRIMARY KEY,
+                    fullname VARCHAR ( 100 ) NOT NULL,
+                    username VARCHAR ( 50 ) NOT NULL,
+                    password VARCHAR ( 255 ) NOT NULL,
+                    email VARCHAR ( 50 ) NOT NULL
+                    );
+                    """)
+    _hashed_password = generate_password_hash('123')
+    cur.execute("INSERT INTO admins (fullname, username, password, email) VALUES (%s,%s,%s,%s)",
+                ('admin', 'admin', _hashed_password, 'admin@gmail.com'))
+
+    conn.commit()
+
+
+
 
