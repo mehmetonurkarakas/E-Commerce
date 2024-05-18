@@ -75,6 +75,123 @@ def create_table():
     #                 (654321, 'emre', 'Smith', 'emre', '123', 'janesmith@example.com', 80)
     #         """)
 
+    # cur.execute("""drop table if exists virtualcurrency""")
+    # cur.execute("""
+    #             CREATE TABLE virtualcurrency (
+    #                  user_id INT NOT NULL,
+    #                  balance NUMERIC,
+    #                  constraint fk_user foreign key(user_id) references users(user_id),
+    #                  constraint balance_check check(balance >= 0)
+    #                  );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists feedbacks""")
+    # cur.execute("""
+    #             CREATE TABLE feedbacks (
+    #                  feedback_id INT PRIMARY KEY,
+    #                  text TEXT,
+    #                  sender_id INT,
+    #                  receiver_id INT,
+    #                  constraint fk_sender foreign key(sender_id) references users(user_id),
+    #                  constraint fk_receiver foreign key(receiver_id) references users(user_id)
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists messages""")
+    # cur.execute("""
+    #             CREATE TABLE messages (
+    #                  message_id INT PRIMARY KEY,
+    #                  message_text TEXT,
+    #                  sender_id INT,
+    #                  receiver_id INT,
+    #                  constraint fk_sender foreign key(sender_id) references users(user_id),
+    #                  constraint fk_receiver foreign key(receiver_id) references users(user_id)
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists tasks""")
+    # cur.execute("""
+    #             CREATE TABLE tasks (
+    #                  task_id INT PRIMARY KEY,
+    #                  giveaway NUMERIC,
+    #                  description TEXT
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists taskconfig""")
+    # cur.execute("""
+    #             CREATE TABLE taskconfig (
+    #                  user_id INT NOT NULL,
+    #                  task_id INT NOT NULL,
+    #                  constraint fk_user foreign key(user_id) references users(user_id),
+    #                  constraint fk_task foreign key(task_id) references tasks(task_id)
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists category""")
+    # cur.execute("""
+    #             CREATE TABLE category (
+    #                  category_id INT PRIMARY KEY,
+    #                  category_name VARCHAR(30)
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists conditionofitem""")
+    # cur.execute("""
+    #             CREATE TABLE conditionofitem (
+    #                  condition_id INT PRIMARY KEY,
+    #                  condition_name VARCHAR(30)
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists notifications""")
+    # cur.execute("""
+    #             CREATE TABLE notifications (
+    #                  notification_id INT PRIMARY KEY,
+    #                  user_id INT NOT NULL,
+    #                  item_id INT NOT NULL,
+    #                  constraint fk_user foreign key(user_id) references users(user_id),
+    #                  constraint fk_item foreign key(item_id) references items(item_id)
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists bids""")
+    # cur.execute("""
+    #             CREATE TABLE bids (
+    #                  bid_id INT PRIMARY KEY,
+    #                  user_id INT NOT NULL,
+    #                  item_id INT NOT NULL,
+    #                  bid_amount NUMERIC,
+    #                  constraint fk_user foreign key(user_id) references users(user_id),
+    #                  constraint fk_item foreign key(item_id) references items(item_id)
+    #                 );
+    #                 """)
+    # conn.commit()
+
+    # cur.execute("""drop table if exists transactions""")
+    # cur.execute("""
+    #             CREATE TABLE transactions (
+    #              transaction_id INT PRIMARY KEY,
+    #              buyer_id INT NOT NULL,
+    #              seller_id INT NOT NULL,
+    #              item_id INT NOT NULL,
+    #              price NUMERIC,
+    #              transaction_date DATE,
+    #              constraint fk_buyer foreign key(buyer_id) references users(user_id),
+    #              constraint fk_seller foreign key(seller_id) references users(user_id),
+    #              constraint fk_item foreign key(item_id) references items(item_id)
+    #             );
+    #                 """)
+    # conn.commit()
+
     conn.commit()
     conn.close()
 
