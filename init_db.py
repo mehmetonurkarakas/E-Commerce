@@ -50,31 +50,25 @@ def create_table():
     cur.execute("""insert into items (name, price,user_id) values ('item2', 20,1)""")
     cur.execute("""insert into items (name, price,user_id) values ('item3', 30,2)""")
     cur.execute("""insert into items (name, price,user_id) values ('item4', 40,2)""")
-
     conn.commit()
+    conn.close()
 
-    # cur.execute("""
-    #             CREATE TABLE IF NOT EXISTS users (
-    #                 user_id SERIAL PRIMARY KEY,
-    #                 student_id INT NOT NULL,
-    #                 name VARCHAR(25) NOT NULL,
-    #                 surname VARCHAR(25) NOT NULL,
-    #                 username VARCHAR(25) NOT NULL,
-    #                 password VARCHAR(16) NOT NULL,
-    #                 email VARCHAR(100),
-    #                 reputation INT,
-    #                 CONSTRAINT email_check CHECK (email LIKE '%@%.%')
-    #             )
-    #         """)
-    # cur.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
-    #
-    # cur.execute("""
-    #             INSERT INTO users (student_id, name, surname, username, password, email, reputation)
-    #             VALUES
-    #                 (123456, 'onur', 'Doe', 'onur', '123', 'johndoe@example.com', 100),
-    #                 (654321, 'emre', 'Smith', 'emre', '123', 'janesmith@example.com', 80)
-    #         """)
 
+def create_bid_table():
+
+    conn = connect_db()
+    cur = conn.cursor()
+
+    cur.execute("""drop table if exists bids""")
+    cur.execute("""
+                    CREATE TABLE bids (
+                    bid_id SERIAL PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    item_id INT NOT NULL,
+                    bid_amount FLOAT NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (item_id) REFERENCES items(item_id)
+                    );""")
     conn.commit()
     conn.close()
 
@@ -82,7 +76,7 @@ def create_table():
 def get_all_items():
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute('SELECT * from items;')
+    cur.execute('SELECT * from items order by item_id;')
     items = cur.fetchall()
     conn.close()
     return items

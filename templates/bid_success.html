@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+
+{% block title %}Bid Success{% endblock %}
+
+{% block content %}
+<h1>Bid Successful!</h1>
+<p>Your bid of ${{ bid_amount }} for {{ item_id }} was successful.</p>
+<a href="{{ url_for('house') }}">Back to Home</a>
+{% endblock %}

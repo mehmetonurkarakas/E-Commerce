@@ -1,16 +1,33 @@
 {% extends 'layout.html' %}
-  
+
 {% block title %}Home{% endblock %}
-  
+
 {% block content %}
 <h1 class="h2">Home Page</h1>
 <p>Welcome back, {{ username }}!</p>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
 
 {% if items %}
   <h2>Items</h2>
   <ul>
     {% for item in items %}
-    <li>{{ item[1] }} - {{ item[2] }}</li>
+    <li>
+        {{ item[1] }} - ${{ item[2] }}
+        {% if not is_admin %}
+        <form method="GET" action="{{ url_for('place_bid', item_id=item[0]) }}">
+            <button type="submit">Teklif Ver</button>
+        </form>
+        {% endif %}
+    </li>
     {% endfor %}
   </ul>
 {% else %}
