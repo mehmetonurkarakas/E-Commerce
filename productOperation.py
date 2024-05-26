@@ -1,3 +1,5 @@
+import psycopg2
+
 from init_db import connect_db
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 
@@ -29,11 +31,21 @@ def delete_item_route(item_id):
 
 
 def create_item(name, price, user_id):
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute('INSERT INTO items (name, price, user_id) VALUES (%s, %s, %s);', (name, price, user_id))
-    conn.commit()
-    conn.close()
+    try:
+        conn = connect_db()
+        with conn.cursor() as cur:
+            cur.execute('SELECT create_item(%s, %s, %s);', (name, price, user_id))
+
+            conn.commit()
+            print("Item başarıyla eklendi.")
+
+    except psycopg2.DatabaseError as e:
+        print(f"Veritabanı hatası: {e}")
+
+    finally:
+
+        if conn:
+            conn.close()
 
 
 def update_item(item_id, name, price):

@@ -3,7 +3,7 @@ import psycopg2
 import psycopg2.extras
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
-from init_db import create_table, connect_db, create_admin,create_bid_table
+from init_db import create_table, connect_db, create_admin, create_bid_table
 from login import logout, register, login, get_all_items
 from navbar import dashboard, feedbacks, products, orders
 from productOperation import create_item_route, update_item_route, delete_item_route
@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.secret_key = 'onur'
 conn = connect_db()
 #create_bid_table()
-# create_table()
+#create_table()
 #create_admin()
 
 app.add_url_rule('/login', 'login', login, methods=['GET', 'POST'])
@@ -39,7 +39,6 @@ def home():
     # if 'loggedin' in session:
     #     return render_template('home.html', username=session['username'])
     return redirect(url_for('login'))
-
 
 
 @app.route('/reports')
