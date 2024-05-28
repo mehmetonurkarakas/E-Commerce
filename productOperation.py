@@ -31,19 +31,19 @@ def delete_item_route(item_id):
 
 
 def create_item(name, price, user_id):
+    conn = None
     try:
         conn = connect_db()
         with conn.cursor() as cur:
-            cur.execute('SELECT create_item(%s, %s, %s);', (name, price, user_id))
-
+            cur.execute('''
+                INSERT INTO items (name, price, user_id, created_at, expires_at, isActive)
+                VALUES (%s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '24 hours', TRUE);
+            ''', (name, price, user_id))
             conn.commit()
             print("Item başarıyla eklendi.")
-
     except psycopg2.DatabaseError as e:
         print(f"Veritabanı hatası: {e}")
-
     finally:
-
         if conn:
             conn.close()
 

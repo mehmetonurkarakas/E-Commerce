@@ -1,3 +1,6 @@
+from datetime import timedelta
+from decimal import Decimal
+
 import psycopg2
 from werkzeug.security import generate_password_hash
 
@@ -73,13 +76,59 @@ def create_bid_table():
     conn.close()
 
 
+def format_timedelta(td):
+    # Zamanı saat, dakika, saniye formatına dönüştürmek için bir fonksiyon
+    hours, remainder = divmod(td.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{td.days} days, {hours} hours, {minutes} minutes, {seconds} seconds"
+
+
+
 def get_all_items():
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute('SELECT * from items order by item_id;')
-    items = cur.fetchall()
-    conn.close()
-    return items
+    conn = None
+    try:
+        conn = connect_db()
+        with conn.cursor() as cur:
+            cur.execute('''
+                SELECT
+                    item_id,
+                    name,
+                    price,
+                    user_id,
+                    created_at,
+                    expires_at,
+                    CASE
+                        WHEN expires_at IS NOT NULL AND expires_at > CURRENT_TIMESTAMP
+                            THEN EXTRACT(EPOCH FROM (expires_at - CURRENT_TIMESTAMP))
+                        ELSE
+                            0
+                    END AS leftTime
+                FROM
+                    items
+                WHERE
+                    isActive = TRUE
+                ORDER BY
+                    item_id;
+            ''')
+            items = cur.fetchall()
+            items_list = []
+            for item in items:
+                item_list = list(item)  # tuple'ı listeye dönüştür
+                if isinstance(item_list[6], Decimal):
+                    item_list[6] = int(item_list[6])  # Convert Decimal to int
+                if item_list[6] != 0:
+                    item_list[6] = timedelta(seconds=item_list[6])
+                else:
+                    item_list[6] = timedelta(seconds=0)
+                items_list.append(item_list)
+            return items_list
+    except psycopg2.DatabaseError as e:
+        print(f"Veritabanı hatası: {e}")
+    finally:
+        if conn:
+            conn.close()
+
+
 
 
 def specific_items(user_id):

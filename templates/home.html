@@ -22,9 +22,11 @@
     {% for item in items %}
     <li>
         {{ item[1] }} - ${{ item[2] }}
+        - Kalan Süre: <span id="leftTime_{{ item[0] }}">{{ item[6] }}</span>
+        <span id="expiredMessage_{{ item[0] }}" style="display: none; color: red;">Artık Bu Ürün İçin Süre Doldu</span>
         {% if not is_admin %}
         <form method="GET" action="{{ url_for('place_bid', item_id=item[0]) }}">
-            <button type="submit">Teklif Ver</button>
+            <button type="submit">Place Bid</button>
         </form>
         {% endif %}
     </li>
@@ -33,5 +35,46 @@
 {% else %}
   <p>No items available</p>
 {% endif %}
+
+<script>
+function updateLeftTime() {
+    var elements = document.querySelectorAll('[id^="leftTime_"]');
+    elements.forEach(function(element) {
+        var timeString = element.textContent.trim();
+        var timeArray = timeString.split(':');
+        var hours = parseInt(timeArray[0]);
+        var minutes = parseInt(timeArray[1]);
+        var seconds = parseInt(timeArray[2]);
+
+        var totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+        function updateTime() {
+            if (totalSeconds > 0) {
+                hours = Math.floor(totalSeconds / 3600);
+                minutes = Math.floor((totalSeconds % 3600) / 60);
+                seconds = totalSeconds % 60;
+
+                element.textContent = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+                totalSeconds--;
+            } else {
+                element.textContent = '00:00:00';
+                clearInterval(intervalId);
+                var expiredMessageId = 'expiredMessage_' + element.id.split('_')[1];
+                var expiredMessageElement = document.getElementById(expiredMessageId);
+                if (expiredMessageElement) {
+                    expiredMessageElement.style.display = 'inline'; // Süre doldu mesajını göster
+                }
+            }
+        }
+
+        updateTime();
+        var intervalId = setInterval(updateTime, 1000);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateLeftTime();
+});
+</script>
 
 {% endblock %}
