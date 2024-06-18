@@ -23,9 +23,15 @@ def feedbacks():
 def products():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+    cursor.execute("SELECT category_id, category_name FROM category")
+    categories = cursor.fetchall()
+
+    cursor.execute("SELECT condition_id, condition_name FROM conditionofitem")
+    conditions = cursor.fetchall()
+
     if 'loggedin' in session:
-        items = specific_items(session['id'])
-        return render_template('products.html', items=items)
+        items = specific_items(session['user_id'])
+        return render_template('products.html', items=items,categories=categories,conditions=conditions)
     return redirect(url_for('login'))
 
 

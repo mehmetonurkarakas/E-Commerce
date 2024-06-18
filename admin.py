@@ -3,10 +3,9 @@ import psycopg2
 import psycopg2.extras
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
-from init_db import create_table, connect_db, create_admin,create_bid_table
+from init_db import create_table, connect_db, create_admin
 from login import logout, register, login, get_all_items
 from navbar import dashboard, feedbacks, products, orders
-from productOperation import create_item_route, update_item_route, delete_item_route
 conn = connect_db()
 
 
