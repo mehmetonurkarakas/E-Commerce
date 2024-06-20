@@ -3,10 +3,9 @@ import psycopg2
 import psycopg2.extras
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
-from init_db import create_table, connect_db, create_admin,create_bid_table
+from init_db import create_table, connect_db, create_admin
 from login import logout, register, login, get_all_items
 from navbar import dashboard, feedbacks, products, orders
-from productOperation import create_item_route, update_item_route, delete_item_route
 conn = connect_db()
 
 
@@ -15,19 +14,19 @@ def place_bid(item_id):
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         if request.method == 'POST':
-            user_id = session['id']
+            user_id = session['user_id']
             bid_amount = float(request.form['bid_amount'])
 
             # Get the current price of the item
-            cursor.execute('SELECT price FROM items WHERE item_id = %s', (item_id,))
-            current_price = cursor.fetchone()[0]
+            cursor.execute('SELECT current_price FROM items WHERE item_id = %s', (item_id,))
+            current_price_row = cursor.fetchone()
+            current_price = float(current_price_row[0]) if current_price_row[0] is not None else 0
 
             # Get the highest bid for the item
             cursor.execute('SELECT MAX(bid_amount) FROM bids WHERE item_id = %s', (item_id,))
-            highest_bid = cursor.fetchone()[0]
+            highest_bid_row = cursor.fetchone()
+            highest_bid = float(highest_bid_row[0]) if highest_bid_row[0] is not None else 0
 
-            if highest_bid is None:
-                highest_bid = 0
 
             # Ensure the bid is higher than both the initial price and the highest bid
             if bid_amount > current_price and bid_amount > highest_bid:
@@ -36,7 +35,7 @@ def place_bid(item_id):
                 conn.commit()
 
                 # Update item price in items table
-                cursor.execute('UPDATE items SET price = %s WHERE item_id = %s', (bid_amount, item_id))
+                cursor.execute('UPDATE items SET current_price = %s WHERE item_id = %s', (bid_amount, item_id))
                 conn.commit()
 
                 return redirect(url_for('bid_success', item_id=item_id))  # Pass item_id to bid_success

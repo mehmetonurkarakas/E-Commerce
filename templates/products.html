@@ -11,14 +11,14 @@
       <h2>Items</h2>
       <ul>
         {% for item in items %}
-        <li>Product Name: {{ item[1] }} - Price: {{ item[2] }}</li>
+        <li>Product Name: {{ item[4] }} - Current Price: {{ item[9] }}</li>
         <form method="POST" action="{{ url_for('update_item_route', item_id=item[0]) }}">
             <label>
-                <input type="text" name="name" value="{{ item[1] }}" placeholder="Name (Minimum 3 characters)" pattern=".{3,}" required>
-            </label>
+                <input type="text" name="title" value="{{ item[1] }}" placeholder="Name (Minimum 3 characters)" pattern=".{3,}" required>
+            </label><br>
             <label>
-                <input type="number" name="price" value="{{ item[2] }}" placeholder="New Price (0 for free)" required>
-            </label>
+                <input type="number" name="starting_price" value="{{ item[2] }}" placeholder="New Price (0 for free)" required>
+            </label><br>
             <button type="submit">Update</button>
         </form>
         <form method="POST" action="{{ url_for('delete_item_route', item_id=item[0]) }}">
@@ -29,16 +29,53 @@
     {% else %}
       <p>No items available</p>
     {% endif %}
+
     <h2>Create New Item</h2>
-    <form method="POST" action="{{ url_for('create_item_route') }}">
+    <form method="POST" action="{{ url_for('create_item_route') }}" enctype="multipart/form-data">
         <label>
-            <input type="text" name="name" placeholder="Name (Minimum 3 characters)" pattern=".{3,}" required>
-        </label>
+            Name (Minimum 3 characters):
+            <input type="text" name="title" pattern=".{3,}" title="Name must be at least 3 characters" required>
+        </label><br>
         <label>
-            <input type="number" name="price" placeholder="Price (0 for free)" required>
-        </label>
+            Starting Price:
+            <input type="number" name="starting_price" min="0" required>
+        </label><br>
+        <label>
+            Category:
+            <select name="category_id" required>
+                {% for cat in categories %}
+                <option value="{{ cat['category_id'] }}">{{ cat['category_name'] }}</option>
+                {% endfor %}
+            </select>
+        </label><br>
+        <label>
+            Condition:
+            <select name="condition_id" required>
+                {% for condition in conditions %}
+                <option value="{{ condition['condition_id'] }}">{{ condition['condition_name'] }}</option>
+                {% endfor %}
+            </select>
+        </label><br>
+        <label>
+            Description:
+            <textarea name="description" required></textarea>
+        </label><br>
+        <label>
+            Stock:
+            <input type="number" name="stock" required>
+        </label><br>
         <button type="submit">Create</button>
     </form>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 
 </div>
 {% endblock %}

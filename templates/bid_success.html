@@ -4,6 +4,6 @@
 
 {% block content %}
 <h1>Bid Successful!</h1>
-<p>Your bid of ${{ bid_amount }} for {{ item_id }} was successful.</p>
+<p>Your bid of {{ item[9] }} for {{ item[4] }} was successful.</p>
 <a href="{{ url_for('house') }}">Back to Home</a>
 {% endblock %}
