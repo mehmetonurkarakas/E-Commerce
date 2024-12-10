@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block title %}Place Bid{% endblock %}
+
+{% block content %}
+<h1>Place Bid for {{ item['name'] }}</h1>
+<p>Current Price: ${{ item['price'] }}</p>
+
+<form method="POST" action="{{ url_for('place_bid', item_id=item['item_id']) }}">
+    <label for="bid_amount">Your Bid:</label>
+    <input type="number" step="0.01" min="{{ item['price'] }}" name="bid_amount" id="bid_amount" required>
+    <button type="submit">Submit Bid</button>
+</form>
+
+<a href="{{ url_for('house') }}">Back to Home</a>
+{% endblock %}

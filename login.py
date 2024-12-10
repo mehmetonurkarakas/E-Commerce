@@ -28,7 +28,7 @@ def login():
             password_rs = account['password']
             if check_password_hash(password_rs, password):
                 session['loggedin'] = True
-                session['id'] = account['id']
+                session['user_id'] = account['user_id']
                 session['username'] = account['username']
                 session['is_admin'] = is_admin
                 print(session)
@@ -75,7 +75,7 @@ def register():
 
 def logout():
     session.pop('loggedin', None)
-    session.pop('id', None)
+    session.pop('user_id', None)
     session.pop('username', None)
     session.pop('is_admin', None)
 
